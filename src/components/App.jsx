@@ -1,4 +1,5 @@
-import { useState } from 'react';
+/* eslint-disable no-unused-expressions */
+import { useState, useEffect } from 'react';
 import Statistics from './Statistics/Statistics';
 import Notification from './Notification/Notification';
 import FeedbackOptions from './FeedbackOptions/FeedbackOptions';
@@ -9,6 +10,8 @@ export default function App() {
   const [good, setGood] = useState(0);
   const [neutral, setNeutral] = useState(0);
   const [bad, setBad] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [positivePercentage, setPositivePercentage] = useState(0);
 
   const btnFeedback = e => {
     switch (e) {
@@ -26,13 +29,13 @@ export default function App() {
     }
   };
 
-  const countTotalFeedback = () => {
-    return neutral + bad + good;
-  };
+  useEffect(() => {
+    setTotal(neutral + bad + good);
+  }, [neutral, bad, good]);
 
-  const countPositiveFeedbackPercentage = () => {
-    return parseInt((good / (good + neutral + bad)) * 100);
-  };
+  useEffect(() => {
+    setPositivePercentage(parseInt((good / (good + neutral + bad)) * 100));
+  }, [neutral, bad, good]);
 
   return (
     <div className={css.container}>
@@ -43,18 +46,16 @@ export default function App() {
         />
       </Section>
       <Section title="Statistics">
-        {countTotalFeedback() !== 0 && (
+        {total !== 0 && (
           <Statistics
             good={good}
             neutral={neutral}
             bad={bad}
-            total={countTotalFeedback()}
-            positivePercentage={countPositiveFeedbackPercentage()}
+            total={total}
+            positivePercentage={positivePercentage}
           />
         )}
-        {countTotalFeedback() === 0 && (
-          <Notification message="There is no feedback" />
-        )}
+        {total === 0 && <Notification message="There is no feedback" />}
       </Section>
     </div>
   );
